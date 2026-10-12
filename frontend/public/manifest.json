@@ -1,0 +1,27 @@
+{
+  "short_name": "NileInvest",
+  "name": "NILE INVESTMENT \u2014 Digital Wealth & Crypto Protocol",
+  "icons": [
+    {
+      "src": "/assets/branding/4116da31-c39a-4191-8e2c-2f956de17429-1_all_21543.jpg",
+      "type": "image/jpeg",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/assets/branding/4116da31-c39a-4191-8e2c-2f956de17429-1_all_21510.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#070B14",
+  "theme_color": "#00E599",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "categories": [
+    "finance",
+    "business",
+    "productivity"
+  ],
+  "description": "Institutional-grade Web3 multi-asset investment, internal ledger wallets, and digital goods marketplace."
+}

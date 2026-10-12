@@ -1,0 +1,12 @@
+{
+  "name": "nile-investment",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-Grade Fintech Platform for NILE INVESTMENT",
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build"
+  }
+}
