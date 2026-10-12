@@ -1,8 +1,1 @@
-{
-  "name": "nile-pro",
-  "compatibility_date": "2026-10-12",
-  "assets": {
-    "directory": "./dist",
-    "binding": "ASSETS"
-  }
-}
+{"name":"nile-pro","compatibility_date":"2026-10-12","pages_build_output_dir":"dist"}
