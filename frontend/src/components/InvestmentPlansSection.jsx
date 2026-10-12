@@ -285,7 +285,7 @@ export default function InvestmentPlansSection() {
                   </div>
                 </div>
                 <span className="text-[10px] text-slate-400 font-mono bg-slate-900 px-2 py-1 rounded border border-white/5">
-                  +${\((calcAmount * effectiveRate / 100) / 86400).toFixed(6)}/ثانیه
+                  +${((calcAmount * effectiveRate / 100) / 86400).toFixed(6)}/ثانیه
                 </span>
               </div>
 
