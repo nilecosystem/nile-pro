@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "react-example",
   "private": true,
   "version": "0.0.0",
@@ -36,5 +37,21 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2"
+=======
+  "name": "nile-investment",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-Grade Fintech Platform for NILE INVESTMENT",
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
+    "npm": "^12.2.0"
+>>>>>>> c8e6a1d5158bca5c59da9cc43a8d83d4c1f2e507
   }
 }

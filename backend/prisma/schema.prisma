@@ -1,0 +1,252 @@
+// Prisma Schema for NILE INVESTMENT Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // In production, switch to "postgresql" and provide DATABASE_URL
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String            @id @default(uuid())
+  email             String            @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  phone             String?
+  role              String            @default("USER") // USER, ADMIN, SUPER_ADMIN
+  kycStatus         String            @default("UNVERIFIED") // UNVERIFIED, PENDING, APPROVED, REJECTED
+  twoFactorEnabled  Boolean           @default(false)
+  twoFactorSecret   String?
+  referralCode      String            @unique
+  referredById      String?
+  referredBy        User?             @relation("ReferralTree", fields: [referredById], references: [id])
+  referrals         User[]            @relation("ReferralTree")
+  referralRank      String            @default("BRONZE") // BRONZE, SILVER, GOLD, PLATINUM, DIAMOND
+  preferredLanguage String            @default("en")
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  wallets           Wallet[]
+  deposits          Deposit[]
+  withdrawals       Withdrawal[]
+  investments       UserInvestment[]
+  stakings          NileStaking[]
+  referralEarnings  ReferralEarning[] @relation("Earner")
+  referredEarnings  ReferralEarning[] @relation("Referee")
+  shopOrders        ShopOrder[]
+  tokenRequests     TokenCreationRequest[]
+  kycDocuments      KycDocument[]
+  auditLogsTargeted AdminAuditLog[]   @relation("TargetUser")
+  auditLogsActed    AdminAuditLog[]   @relation("AdminUser")
+}
+
+model Wallet {
+  id          String        @id @default(uuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String        // INTERNAL, INVESTMENT, REFERRAL, SHOP
+  balance     Float         @default(0.0)
+  currency    String        @default("USDT") // USDT or NILE
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  deposits    Deposit[]
+  withdrawals Withdrawal[]
+
+  @@unique([userId, type, currency])
+}
+
+model Deposit {
+  id          String        @id @default(uuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  walletId    String
+  wallet      Wallet        @relation(fields: [walletId], references: [id])
+  amount      Float
+  currency    String        @default("USDT")
+  txid        String        @unique
+  network     String        // TRC20, ERC20, BEP20, SOLANA
+  status      String        @default("PENDING") // PENDING, CONFIRMED, REJECTED
+  confirmedBy String?
+  confirmedAt DateTime?
+  createdAt   DateTime      @default(now())
+}
+
+model Withdrawal {
+  id           String       @id @default(uuid())
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  walletId     String
+  wallet       Wallet       @relation(fields: [walletId], references: [id])
+  amount       Float
+  currency     String       @default("USDT")
+  toAddress    String
+  network      String
+  status       String       @default("PENDING") // PENDING, APPROVED, REJECTED, PROCESSED
+  payoutTxid   String?
+  cycleWindow  String       // Cycle 1 (00:00-03:00), Cycle 2 (06:00-09:00), etc.
+  approvedBy   String?
+  approvedAt   DateTime?
+  rejectionReason String?
+  createdAt    DateTime     @default(now())
+}
+
+model InvestmentPlan {
+  id                  String           @id @default(uuid())
+  planType            String           // ASSET_BASED, TIME_LOCKED, AMOUNT_TIER
+  name                String
+  minDeposit          Float
+  maxDeposit          Float?
+  dailyProfitPercent  Float            @default(0.0)
+  lockDays            Int              @default(0) // 0 for flexible, or 30, 50, 100
+  fixedRewardPercent  Float?           @default(0.0)
+  isActive            Boolean          @default(true)
+  description         String?
+  createdAt           DateTime         @default(now())
+
+  investments         UserInvestment[]
+}
+
+model UserInvestment {
+  id                   String           @id @default(uuid())
+  userId               String
+  user                 User             @relation(fields: [userId], references: [id])
+  planId               String
+  plan                 InvestmentPlan   @relation(fields: [planId], references: [id])
+  amount               Float
+  currency             String           @default("USDT")
+  paymentSource        String           @default("INTERNAL_WALLET") // INTERNAL_WALLET, NILE_TOKEN
+  fundedWithNile       Boolean          @default(false) // If funded with NILE -> profits 2x doubled!
+  dailyProfitPercent   Float
+  dailyProfitAmount    Float
+  totalProfitAccrued   Float            @default(0.0)
+  status               String           @default("ACTIVE") // ACTIVE, MATURED, WITHDRAWN
+  startDate            DateTime         @default(now())
+  maturityDate         DateTime?
+  lastProfitRun        DateTime         @default(now())
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  referralDistributions ReferralEarning[]
+}
+
+model NileStaking {
+  id             String       @id @default(uuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  amountNile     Float
+  lockDays       Int          // 30, 50, 100
+  bonusPercent   Float        // 50% for 30d, 100% for 50d, 250% for 100d
+  rewardNile     Float
+  status         String       @default("ACTIVE") // ACTIVE, MATURED, CLAIMED
+  startDate      DateTime     @default(now())
+  maturityDate   DateTime
+  claimedAt      DateTime?
+  createdAt      DateTime     @default(now())
+}
+
+model ReferralEarning {
+  id             String           @id @default(uuid())
+  referrerId     String
+  referrer       User             @relation("Earner", fields: [referrerId], references: [id])
+  refereeId      String
+  referee        User             @relation("Referee", fields: [refereeId], references: [id])
+  investmentId   String
+  investment     UserInvestment   @relation(fields: [investmentId], references: [id])
+  level          Int              // 1 to 10
+  percent        Float            // 10% down to 1%
+  amount         Float
+  reinvested     Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+}
+
+model ShopProduct {
+  id             String       @id @default(uuid())
+  category       String       // CRYPTO, SOFTWARE, FINANCIAL_SERVICES, AI_TOOLS
+  title          String
+  description    String
+  priceUsdt      Float
+  inventoryCount Int          @default(100)
+  isAvailable    Boolean      @default(true)
+  metadata       String?      // JSON string for specific options (e.g., license type)
+  createdAt      DateTime     @default(now())
+
+  orders         ShopOrder[]
+}
+
+model ShopOrder {
+  id              String       @id @default(uuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id])
+  productId       String
+  product         ShopProduct  @relation(fields: [productId], references: [id])
+  amountPaidUsdt  Float
+  status          String       @default("PENDING") // PENDING, DELIVERED, REJECTED
+  licenseKey      String?
+  deliveryNotes   String?
+  createdAt       DateTime     @default(now())
+}
+
+model TokenCreationRequest {
+  id              String       @id @default(uuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id])
+  tokenName       String
+  tokenSymbol     String
+  network         String       // BEP20, ERC20, TRC20, SOLANA, SUI
+  decimals        Int          @default(18)
+  totalSupply     Float
+  extraFeatures   String?      // Mintable, Burnable, Tax, Blacklist
+  status          String       @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, REJECTED
+  priceQuotedUsdt Float        @default(499.0)
+  deployedAddress String?
+  notes           String?
+  createdAt       DateTime     @default(now())
+}
+
+model AcademyArticle {
+  id              String       @id @default(uuid())
+  title           String
+  slug            String       @unique
+  category        String       // CRYPTO_BASICS, INVESTMENT, SECURITY, GUIDES, FAQ
+  language        String       @default("en")
+  summary         String
+  contentMarkdown String
+  readTimeMinutes Int          @default(5)
+  isPublished     Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model AdminAuditLog {
+  id              String       @id @default(uuid())
+  adminId         String
+  admin           User         @relation("AdminUser", fields: [adminId], references: [id])
+  targetUserId    String?
+  targetUser      User?        @relation("TargetUser", fields: [targetUserId], references: [id])
+  actionType      String       // BALANCE_ADJUST, KYC_APPROVE, WITHDRAW_APPROVE, PLAN_MODIFY, LOGIN_AS_USER, etc.
+  beforeValue     String?      // JSON string
+  afterValue      String?      // JSON string
+  reason          String
+  ipAddress       String?
+  userAgent       String?
+  createdAt       DateTime     @default(now())
+}
+
+model KycDocument {
+  id              String       @id @default(uuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id])
+  idType          String       // PASSPORT, NATIONAL_ID, DRIVERS_LICENSE
+  idNumber        String
+  frontImageUrl   String
+  backImageUrl    String?
+  selfieUrl       String?
+  status          String       @default("PENDING") // PENDING, APPROVED, REJECTED
+  adminNotes      String?
+  reviewedAt      DateTime?
+  createdAt       DateTime     @default(now())
+}

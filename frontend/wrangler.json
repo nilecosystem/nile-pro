@@ -1,0 +1,7 @@
+{
+  "name": "nile-pro",
+  "compatibility_date": "2026-10-12",
+  "assets": {
+    "directory": "./dist"
+  }
+}
