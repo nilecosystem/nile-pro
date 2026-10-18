@@ -30,7 +30,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
           referrerPolicy="no-referrer"
           className="w-full h-full object-contain p-0.5 rounded-lg" 
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = '/logo.png';
+            (e.currentTarget as HTMLImageElement).src = '/4116da31-c39a-4191-8e2c-2f956de17429-1_all_21510.png';
           }}
         />
       </div>

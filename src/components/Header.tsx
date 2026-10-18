@@ -146,7 +146,7 @@ export const Header: React.FC = () => {
               alt="Nile Ecosystem Official Logo" 
               referrerPolicy="no-referrer"
               className="w-full h-full object-contain rounded-xl"
-              onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/logo.png'; }}
+              onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/4116da31-c39a-4191-8e2c-2f956de17429-1_all_21510.png'; }}
             />
             <div className="absolute inset-0 rounded-xl bg-gradient-to-tr from-[#E5B842]/20 via-transparent to-cyan-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>

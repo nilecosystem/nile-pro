@@ -33,7 +33,7 @@ export const MascotBadge: React.FC<MascotBadgeProps> = ({
           referrerPolicy="no-referrer"
           className="w-full h-full object-contain rounded-xl relative z-10 transition-transform group-hover:scale-105"
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = '/logo.png';
+            (e.currentTarget as HTMLImageElement).src = '/4116da31-c39a-4191-8e2c-2f956de17429-1_all_21510.png';
           }}
         />
         {/* Mini Gold crown top pin */}
