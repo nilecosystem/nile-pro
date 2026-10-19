@@ -13,6 +13,9 @@ const shopRoutes = require('./routes/shopRoutes');
 const academyRoutes = require('./routes/academyRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const { runDailyProfitDistribution } = require('./services/investmentEngine');
+const paymentGatewayRoutes = require('./routes/paymentGatewayRoutes');
+// ...
+app.use('/api/payments', paymentGatewayRoutes);
 
 const app = express();
 
