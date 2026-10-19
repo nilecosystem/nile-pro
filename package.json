@@ -1,20 +1,27 @@
+
 {
-<<<<<<< HEAD
-  "name": "react-example",
+  "name": "nile-pro",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "description": "Nile Ecosystem",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "start": "node backend/src/server.js",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/canvas-confetti": "^1.9.0",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "@vitejs/plugin-react": "^6.1.1",
     "canvas-confetti": "^1.9.4",
     "dotenv": "^17.2.3",
@@ -37,21 +44,5 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2"
-=======
-  "name": "nile-investment",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Production-Grade Fintech Platform for NILE INVESTMENT",
-  "scripts": {
-    "start": "node backend/src/server.js",
-    "dev:backend": "cd backend && npm run dev",
-    "dev:frontend": "cd frontend && npm run dev",
-    "build:frontend": "cd frontend && npm run build"
-  },
-  "dependencies": {
-    "@vercel/analytics": "^2.0.1",
-    "@vercel/speed-insights": "^2.0.0",
-    "npm": "^12.2.0"
->>>>>>> c8e6a1d5158bca5c59da9cc43a8d83d4c1f2e507
   }
 }
