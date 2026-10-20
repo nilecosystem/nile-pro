@@ -5,7 +5,7 @@
     "slug": "nile-ecosystem",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logos/mobile-logo.png",
+    "icon": "./assets/images/mobile-logo.png",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "cover",
@@ -20,7 +20,7 @@
     ],
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logos/mobile-logo.png",
+        "foregroundImage": "./assets/images/mobile-logo.png",
         "backgroundColor": "#1E40AF"
       }
     },
