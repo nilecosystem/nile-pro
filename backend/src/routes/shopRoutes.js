@@ -1,9 +1,10 @@
+// src/backend/main/routes/shopRoutes.js
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
 const prisma = require('../utils/prisma');
 
-// List shop products by category
+// ✅ List shop products by category
 router.get('/products', async (req, res) => {
   const { category } = req.query;
   try {
@@ -20,7 +21,7 @@ router.get('/products', async (req, res) => {
   }
 });
 
-// Purchase a product from the shop
+// ✅ Purchase a product from the shop
 router.post('/orders', authenticateToken, async (req, res) => {
   const { productId, walletType = 'SHOP' } = req.body;
 
@@ -47,14 +48,13 @@ router.post('/orders', authenticateToken, async (req, res) => {
       });
     }
 
-    // Deduct wallet and create order
     const order = await prisma.$transaction(async (tx) => {
       await tx.wallet.update({
         where: { id: wallet.id },
         data: { balance: { decrement: product.priceUsdt } }
       });
 
-      return await tx.shopOrder.create({
+      return tx.shopOrder.create({
         data: {
           userId: req.user.id,
           productId: product.id,
@@ -75,7 +75,7 @@ router.post('/orders', authenticateToken, async (req, res) => {
   }
 });
 
-// Request Token Creation Service (BEP20, ERC20, TRC20, Solana, Sui)
+// ✅ Request Token Creation Service
 router.post('/token-creation', authenticateToken, async (req, res) => {
   const { tokenName, tokenSymbol, network, decimals, totalSupply, extraFeatures } = req.body;
 
@@ -104,7 +104,7 @@ router.post('/token-creation', authenticateToken, async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Token creation request submitted. Our quantitative smart contract team will initiate deployment.',
+      message: 'Token creation request submitted. Our smart contract team will initiate deployment.',
       tokenRequest
     });
   } catch (err) {
@@ -112,7 +112,7 @@ router.post('/token-creation', authenticateToken, async (req, res) => {
   }
 });
 
-// Get user orders and token requests
+// ✅ Get user orders and token requests
 router.get('/my-orders', authenticateToken, async (req, res) => {
   try {
     const [orders, tokenRequests] = await Promise.all([
