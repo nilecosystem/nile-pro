@@ -1,0 +1,27 @@
+/* src/layout.css */
+
+/* کانتینر اصلی برای محدود کردن عرض و تنظیم فاصله‌ها */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* بخش‌های عمومی صفحه */
+.section {
+  padding: 40px 20px;
+}
+
+/* گرید عمومی برای چیدمان کارت‌ها یا ستون‌ها */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* کلاس فلکس عمومی */
+.flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
