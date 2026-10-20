@@ -1,0 +1,34 @@
+/* src/footer.css */
+
+/* استایل کلی فوتر */
+footer {
+  width: 100%;
+  background-color: #0a0a0a; /* رنگ تیره هماهنگ با هدر */
+  color: #ffffff;
+  padding: 20px;
+  text-align: center;
+}
+
+/* متن کپی‌رایت یا توضیحات */
+footer .copyright {
+  font-size: 0.9rem;
+  color: #aaaaaa;
+}
+
+/* لینک‌های فوتر */
+footer nav {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+footer nav a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+footer nav a:hover {
+  color: #ffd700; /* طلایی برای hover */
+}
