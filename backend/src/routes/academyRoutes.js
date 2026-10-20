@@ -1,8 +1,9 @@
+// src/backend/main/routes/academyRoutes.js
 const express = require('express');
 const router = express.Router();
 const prisma = require('../utils/prisma');
 
-// Get academy articles with language and category filters
+// ✅ Get academy articles with language and category filters
 router.get('/articles', async (req, res) => {
   const { category, language = 'en' } = req.query;
   try {
@@ -19,20 +20,22 @@ router.get('/articles', async (req, res) => {
   }
 });
 
-// Get article by slug
+// ✅ Get article by slug
 router.get('/articles/:slug', async (req, res) => {
   try {
     const article = await prisma.academyArticle.findUnique({
       where: { slug: req.params.slug }
     });
-    if (!article) return res.status(404).json({ success: false, message: 'Article not found.' });
+    if (!article) {
+      return res.status(404).json({ success: false, message: 'Article not found.' });
+    }
     res.json({ success: true, article });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// FAQ system
+// ✅ FAQ system (static content)
 router.get('/faqs', (req, res) => {
   const faqs = [
     {
@@ -41,7 +44,7 @@ router.get('/faqs', (req, res) => {
     },
     {
       q: 'What are the withdrawal cycles and rules?',
-      a: 'Withdrawals are processed across 4 daily 3-hour cycles (00:00–03:00, 06:00–09:00, 12:00–15:00, 18:00–21:00 UTC). Once submitted, our security compliance team reviews and broadcasts the payout, recording the on-chain TXID in your portal.'
+      a: 'Withdrawals are processed across 4 daily 3-hour cycles (00:00–03:00, 06:00–09:00, 12:00–15:00, 18:00–21:00 UTC). Once submitted, our compliance team reviews and broadcasts the payout, recording the on-chain TXID in your portal.'
     },
     {
       q: 'Can I withdraw my Referral Wallet earnings immediately?',
