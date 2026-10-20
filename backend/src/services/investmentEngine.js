@@ -11,7 +11,7 @@ const AMOUNT_TIERS = [
 ];
 
 /**
- * Determine daily profit percent based on plan type and amount
+ * Determine daily profit percent
  */
 const calculateProfitRate = (planType, amount, customPercent = 0.0) => {
   if (planType === 'AMOUNT_TIER') {
@@ -22,170 +22,94 @@ const calculateProfitRate = (planType, amount, customPercent = 0.0) => {
 };
 
 /**
- * Create a new user investment with support for NILE 2x multiplier
+ * Create a new investment
  */
 const createInvestment = async ({ userId, planId, amount, paymentSource = 'INTERNAL_WALLET' }) => {
-  if (!prisma) throw new Error('Database unavailable');
   if (amount <= 0) throw new Error('Investment amount must be positive.');
 
   const plan = await prisma.investmentPlan.findUnique({ where: { id: planId } });
-  if (!plan || !plan.isActive) throw new Error('Invalid or inactive investment plan.');
+  if (!plan || !plan.isActive) throw new Error('Invalid or inactive plan.');
+  if (amount < plan.minDeposit) throw new Error(`Minimum investment is ${plan.minDeposit} USDT.`);
+  if (plan.maxDeposit && amount > plan.maxDeposit) throw new Error(`Maximum investment is ${plan.maxDeposit} USDT.`);
 
-  if (amount < plan.minDeposit) {
-    throw new Error(`Minimum investment for this plan is ${plan.minDeposit} USDT.`);
-  }
-  if (plan.maxDeposit && amount > plan.maxDeposit) {
-    throw new Error(`Maximum investment for this plan is ${plan.maxDeposit} USDT.`);
-  }
-
-  // Deduct from appropriate user wallet
   const isNileFunding = (paymentSource === 'NILE_TOKEN');
   const currencyToDeduct = isNileFunding ? 'NILE' : 'USDT';
-  const walletType = isNileFunding ? 'INTERNAL' : 'INTERNAL';
 
   const userWallet = await prisma.wallet.findUnique({
-    where: {
-      userId_type_currency: {
-        userId,
-        type: walletType,
-        currency: currencyToDeduct
-      }
-    }
+    where: { userId_type_currency: { userId, type: 'INTERNAL', currency: currencyToDeduct } }
   });
+  if (!userWallet || userWallet.balance < amount) throw new Error(`Insufficient ${currencyToDeduct} balance.`);
 
-  if (!userWallet || userWallet.balance < amount) {
-    throw new Error(`Insufficient ${currencyToDeduct} balance in wallet.`);
-  }
+  let baseDailyPercent = plan.planType === 'AMOUNT_TIER'
+    ? calculateProfitRate('AMOUNT_TIER', amount)
+    : plan.dailyProfitPercent || 0;
 
-  // Base daily percentage
-  let baseDailyPercent = 0;
-  if (plan.planType === 'AMOUNT_TIER') {
-    baseDailyPercent = calculateProfitRate('AMOUNT_TIER', amount);
-  } else {
-    baseDailyPercent = plan.dailyProfitPercent || 0;
-  }
-
-  // NILE TOKEN DOUBLE RULE: If funded with NILE token -> ALL investment profits are doubled!
   const effectiveDailyPercent = isNileFunding ? (baseDailyPercent * 2) : baseDailyPercent;
   const dailyProfitAmount = (amount * effectiveDailyPercent) / 100;
 
-  // Compute maturity date for Time-Locked plans
   let maturityDate = null;
   if (plan.lockDays > 0) {
     maturityDate = new Date();
     maturityDate.setDate(maturityDate.getDate() + plan.lockDays);
   }
 
-  // Transactionally debit wallet, credit investment wallet record, and distribute referral rewards
-  const result = await prisma.$transaction(async (tx) => {
-    // 1. Debit funding wallet
+  const investment = await prisma.$transaction(async (tx) => {
+    await tx.wallet.update({ where: { id: userWallet.id }, data: { balance: { decrement: amount } } });
     await tx.wallet.update({
-      where: { id: userWallet.id },
-      data: { balance: { decrement: amount } }
-    });
-
-    // 2. Increment Investment Wallet balance ledger
-    await tx.wallet.update({
-      where: {
-        userId_type_currency: {
-          userId,
-          type: 'INVESTMENT',
-          currency: currencyToDeduct
-        }
-      },
+      where: { userId_type_currency: { userId, type: 'INVESTMENT', currency: currencyToDeduct } },
       data: { balance: { increment: amount } }
     });
 
-    // 3. Create Investment record
-    const investment = await tx.userInvestment.create({
+    return tx.userInvestment.create({
       data: {
-        userId,
-        planId,
-        amount,
-        currency: currencyToDeduct,
-        paymentSource,
-        fundedWithNile: isNileFunding,
+        userId, planId, amount, currency: currencyToDeduct,
+        paymentSource, fundedWithNile: isNileFunding,
         dailyProfitPercent: effectiveDailyPercent,
-        dailyProfitAmount,
-        maturityDate,
-        status: 'ACTIVE'
+        dailyProfitAmount, maturityDate, status: 'ACTIVE'
       }
     });
-
-    return investment;
   });
 
-  return result;
+  return { success: true, message: 'Investment created successfully.', investment };
 };
 
 /**
- * Daily Profit Calculation Engine
- * Calculates and credits profits to users, respecting plan rules and NILE double bonus
+ * Daily Profit Distribution Engine
  */
 const runDailyProfitDistribution = async () => {
-  if (!prisma) return { processed: 0, totalProfitDistributed: 0 };
-
   const now = new Date();
-  const activeInvestments = await prisma.userInvestment.findMany({
-    where: { status: 'ACTIVE' },
-    include: { plan: true, user: true }
-  });
+  const activeInvestments = await prisma.userInvestment.findMany({ where: { status: 'ACTIVE' }, include: { plan: true } });
 
-  let count = 0;
-  let totalDistributed = 0;
+  let count = 0, totalDistributed = 0;
 
   for (const inv of activeInvestments) {
-    // Check if time-locked plan has reached maturity
-    if (inv.maturityDate && now >= inv.maturityDate) {
-      if (inv.plan.planType === 'TIME_LOCKED' && inv.plan.fixedRewardPercent > 0) {
-        // Apply fixed reward at maturity
-        let rewardMultiplier = inv.plan.fixedRewardPercent / 100;
-        if (inv.fundedWithNile) rewardMultiplier *= 2; // NILE 2x
-        const reward = inv.amount * rewardMultiplier;
+    if (inv.maturityDate && now >= inv.maturityDate && inv.plan.planType === 'TIME_LOCKED') {
+      let rewardMultiplier = inv.plan.fixedRewardPercent / 100;
+      if (inv.fundedWithNile) rewardMultiplier *= 2;
+      const reward = inv.amount * rewardMultiplier;
 
-        await prisma.$transaction([
-          // Return principal + reward to Internal wallet
-          prisma.wallet.update({
-            where: {
-              userId_type_currency: {
-                userId: inv.userId,
-                type: 'INTERNAL',
-                currency: inv.currency
-              }
-            },
-            data: { balance: { increment: inv.amount + reward } }
-          }),
-          prisma.userInvestment.update({
-            where: { id: inv.id },
-            data: {
-              status: 'MATURED',
-              totalProfitAccrued: { increment: reward }
-            }
-          })
-        ]);
-        continue;
-      }
+      await prisma.$transaction([
+        prisma.wallet.update({
+          where: { userId_type_currency: { userId: inv.userId, type: 'INTERNAL', currency: inv.currency } },
+          data: { balance: { increment: inv.amount + reward } }
+        }),
+        prisma.userInvestment.update({
+          where: { id: inv.id },
+          data: { status: 'MATURED', totalProfitAccrued: { increment: reward } }
+        })
+      ]);
+      continue;
     }
 
-    // Daily profit distribution for ongoing investments
     if (inv.dailyProfitAmount > 0) {
       await prisma.$transaction([
         prisma.wallet.update({
-          where: {
-            userId_type_currency: {
-              userId: inv.userId,
-              type: 'INTERNAL',
-              currency: inv.currency
-            }
-          },
+          where: { userId_type_currency: { userId: inv.userId, type: 'INTERNAL', currency: inv.currency } },
           data: { balance: { increment: inv.dailyProfitAmount } }
         }),
         prisma.userInvestment.update({
           where: { id: inv.id },
-          data: {
-            totalProfitAccrued: { increment: inv.dailyProfitAmount },
-            lastProfitRun: now
-          }
+          data: { totalProfitAccrued: { increment: inv.dailyProfitAmount }, lastProfitRun: now }
         })
       ]);
       count++;
@@ -193,73 +117,31 @@ const runDailyProfitDistribution = async () => {
     }
   }
 
-  return { processed: count, totalProfitDistributed: totalDistributed };
+  return { success: true, message: 'Daily profit run completed.', processed: count, totalProfitDistributed: totalDistributed };
 };
 
 /**
- * NILE Staking System:
- * 30 days -> +50%
- * 50 days -> +100%
- * 100 days -> +250%
+ * NILE Staking System
  */
 const stakeNileTokens = async ({ userId, amount, lockDays }) => {
-  if (!prisma) throw new Error('Database unavailable');
   if (amount <= 0) throw new Error('Staking amount must be positive.');
 
-  const STAKING_CONFIG = {
-    30: 50.0,   // +50%
-    50: 100.0,  // +100%
-    100: 250.0  // +250%
-  };
-
+  const STAKING_CONFIG = { 30: 50.0, 50: 100.0, 100: 250.0 };
   const bonusPercent = STAKING_CONFIG[lockDays];
-  if (!bonusPercent) {
-    throw new Error('Valid staking lock periods are strictly 30, 50, or 100 days.');
-  }
+  if (!bonusPercent) throw new Error('Valid lock periods: 30, 50, 100 days.');
 
-  // Deduct NILE tokens from internal wallet
-  const nileWallet = await prisma.wallet.findUnique({
-    where: {
-      userId_type_currency: {
-        userId,
-        type: 'INTERNAL',
-        currency: 'NILE'
-      }
-    }
-  });
-
-  if (!nileWallet || nileWallet.balance < amount) {
-    throw new Error('Insufficient NILE tokens in wallet for staking.');
-  }
+  const nileWallet = await prisma.wallet.findUnique({ where: { userId_type_currency: { userId, type: 'INTERNAL', currency: 'NILE' } } });
+  if (!nileWallet || nileWallet.balance < amount) throw new Error('Insufficient NILE tokens.');
 
   const rewardNile = (amount * bonusPercent) / 100;
-  const maturityDate = new Date();
-  maturityDate.setDate(maturityDate.getDate() + lockDays);
+  const maturityDate = new Date(); maturityDate.setDate(maturityDate.getDate() + lockDays);
 
-  return await prisma.$transaction(async (tx) => {
-    await tx.wallet.update({
-      where: { id: nileWallet.id },
-      data: { balance: { decrement: amount } }
-    });
-
-    return await tx.nileStaking.create({
-      data: {
-        userId,
-        amountNile: amount,
-        lockDays,
-        bonusPercent,
-        rewardNile,
-        maturityDate,
-        status: 'ACTIVE'
-      }
-    });
+  const staking = await prisma.$transaction(async (tx) => {
+    await tx.wallet.update({ where: { id: nileWallet.id }, data: { balance: { decrement: amount } } });
+    return tx.nileStaking.create({ data: { userId, amountNile: amount, lockDays, bonusPercent, rewardNile, maturityDate, status: 'ACTIVE' } });
   });
+
+  return { success: true, message: `Successfully staked ${amount} NILE for ${lockDays} days.`, staking };
 };
 
-module.exports = {
-  AMOUNT_TIERS,
-  calculateProfitRate,
-  createInvestment,
-  runDailyProfitDistribution,
-  stakeNileTokens
-};
+module.exports = { AMOUNT_TIERS, calculateProfitRate, createInvestment, runDailyProfitDistribution, stakeNileTokens };
