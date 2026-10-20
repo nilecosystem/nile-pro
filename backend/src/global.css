@@ -1,0 +1,7 @@
+/* src/global.css */
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background-color: #0F172A; /* رنگ پس‌زمینه */
+  color: #FFFFFF;            /* رنگ متن */
+}
