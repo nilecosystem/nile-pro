@@ -5,8 +5,8 @@ module.exports = {
   backgroundColor: "#0F172A",
   themeColor: "#1E40AF",
   icons: {
-    small: "src/assets/logos/windows-logo-192.png",
-    large: "src/assets/logos/windows-logo-512.png"
+    small: "src/assets/images/windows-logo-192.png",
+    large: "src/assets/images/windows-logo-512.png"
   },
   splashScreen: {
     image: "src/assets/images/splash.png",
