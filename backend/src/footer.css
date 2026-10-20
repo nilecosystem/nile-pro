@@ -1,0 +1,7 @@
+/* src/footer.css */
+footer {
+  background-color: #0F172A; /* background */
+  color: #F59E0B;            /* secondary */
+  text-align: center;
+  padding: 10px;
+}
