@@ -1,3 +1,4 @@
+// src/backend/main/server.js
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -12,10 +13,8 @@ const referralRoutes = require('./routes/referralRoutes');
 const shopRoutes = require('./routes/shopRoutes');
 const academyRoutes = require('./routes/academyRoutes');
 const adminRoutes = require('./routes/adminRoutes');
-const { runDailyProfitDistribution } = require('./services/investmentEngine');
 const paymentGatewayRoutes = require('./routes/paymentGatewayRoutes');
-// ...
-app.use('/api/payments', paymentGatewayRoutes);
+const { runDailyProfitDistribution } = require('./services/investmentEngine');
 
 const app = express();
 
@@ -60,12 +59,13 @@ app.use('/api/referrals', referralRoutes);
 app.use('/api/shop', shopRoutes);
 app.use('/api/academy', academyRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/payments', paymentGatewayRoutes);
 
-// Daily Profit Engine Runner (Runs every 24 hours in production background)
+// Daily Profit Engine Runner
 setInterval(async () => {
   try {
     const res = await runDailyProfitDistribution();
-    console.log(`[DAILY PROFIT ENGINE] Successfully distributed profits: ${res.processed} investments credited.`);
+    console.log(`[DAILY PROFIT ENGINE] Distributed profits: ${res.processed} investments credited.`);
   } catch (err) {
     console.error('[DAILY PROFIT ENGINE ERROR]', err.message);
   }
@@ -81,14 +81,12 @@ app.use((err, req, res, next) => {
 });
 
 // Start Server
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(config.port, () => {
-    console.log(`=======================================================`);
-    console.log(`🚀 NILE INVESTMENT BACKEND ONLINE ON PORT ${config.port}`);
-    console.log(`🌍 UK Office: ${config.offices.uk.address}`);
-    console.log(`🏢 UAE Office: ${config.offices.uae.address}`);
-    console.log(`=======================================================`);
-  });
-}
+app.listen(config.port, () => {
+  console.log('=======================================================');
+  console.log(`🚀 NILE INVESTMENT BACKEND ONLINE ON PORT ${config.port}`);
+  console.log(`🌍 UK Office: ${config.offices.uk.address}`);
+  console.log(`🏢 UAE Office: ${config.offices.uae.address}`);
+  console.log('=======================================================');
+});
 
 module.exports = app;
