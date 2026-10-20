@@ -1,3 +1,4 @@
+// src/backend/main/routes/adminRoutes.js
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
@@ -9,10 +10,10 @@ const { runDailyProfitDistribution } = require('../services/investmentEngine');
 const prisma = require('../utils/prisma');
 const config = require('../config');
 
-// All endpoints in this router require Admin or Super Admin role
+// ✅ All endpoints require Admin or Super Admin role
 router.use(authenticateToken, requireAdmin);
 
-// 1. Get all users with wallet balances and status
+// ✅ Get all users with wallet balances and status
 router.get('/users', async (req, res) => {
   try {
     const users = await prisma.user.findMany({
@@ -30,7 +31,7 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// 2. Login As User (Impersonation) with strict audit logging
+// ✅ Login As User (Impersonation) with strict audit logging
 router.post('/users/:userId/impersonate', async (req, res) => {
   const { reason } = req.body;
   if (!reason) {
@@ -69,7 +70,7 @@ router.post('/users/:userId/impersonate', async (req, res) => {
   }
 });
 
-// 3. Add or Remove User Wallet Balance
+// ✅ Adjust User Wallet Balance
 router.post('/users/:userId/adjust-balance', async (req, res) => {
   const { walletType, currency = 'USDT', deltaAmount, reason } = req.body;
   if (!reason || deltaAmount === undefined) {
@@ -124,7 +125,7 @@ router.post('/users/:userId/adjust-balance', async (req, res) => {
   }
 });
 
-// 4. Approve/Reject KYC Verification
+// ✅ Approve/Reject KYC Verification
 router.post('/users/:userId/kyc-decision', async (req, res) => {
   const { status, reason, adminNotes } = req.body;
   if (!['APPROVED', 'REJECTED'].includes(status) || !reason) {
@@ -169,7 +170,7 @@ router.post('/users/:userId/kyc-decision', async (req, res) => {
   }
 });
 
-// 5. Manage Deposits (Confirm Deposit)
+// ✅ Confirm Deposit
 router.post('/deposits/:depositId/confirm', async (req, res) => {
   const { reason } = req.body;
   try {
@@ -195,7 +196,7 @@ router.post('/deposits/:depositId/confirm', async (req, res) => {
   }
 });
 
-// 6. Manage Withdrawals (Approve with TXID or Reject)
+// ✅ Approve/Reject Withdrawals
 router.post('/withdrawals/:withdrawalId/payout', async (req, res) => {
   const { action, payoutTxid, reason } = req.body; // action: 'APPROVE' or 'REJECT'
   try {
@@ -236,43 +237,5 @@ router.post('/withdrawals/:withdrawalId/payout', async (req, res) => {
   }
 });
 
-// 7. Trigger Daily Profit Calculation Engine manually
+// ✅ Trigger Daily Profit Calculation Engine manually
 router.post('/trigger-profit-run', async (req, res) => {
-  const { reason } = req.body;
-  try {
-    const result = await runDailyProfitDistribution();
-
-    await logAdminAction({
-      adminId: req.user.id,
-      actionType: 'MANUAL_PROFIT_RUN',
-      beforeValue: null,
-      afterValue: result,
-      reason: reason || 'Scheduled / manual batch daily profit calculation',
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    });
-
-    res.json({ success: true, message: 'Daily profit calculation engine executed.', ...result });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-// 8. View Complete Admin Audit Trail
-router.get('/audit-logs', async (req, res) => {
-  try {
-    const logs = await prisma.adminAuditLog.findMany({
-      include: {
-        admin: { select: { email: true, firstName: true } },
-        targetUser: { select: { email: true, firstName: true } }
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 100
-    });
-    res.json({ success: true, logs });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-module.exports = router;
