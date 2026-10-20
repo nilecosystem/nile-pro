@@ -1,16 +1,21 @@
+// src/backend/main/routes/referralRoutes.js
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
 const referralEngine = require('../services/referralEngine');
 const prisma = require('../utils/prisma');
 
-// Get referral overview and rank
+// ✅ Referral overview and rank
 router.get('/stats', authenticateToken, async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
       select: { referralCode: true, referralRank: true }
     });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
 
     const [directCount, totalEarnings, refWallet] = await Promise.all([
       prisma.user.count({ where: { referredById: req.user.id } }),
@@ -43,7 +48,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
   }
 });
 
-// Get 10-level referral breakdown
+// ✅ 10-level referral breakdown
 router.get('/tree', authenticateToken, async (req, res) => {
   try {
     const earningsByLevel = await prisma.referralEarning.groupBy({
@@ -72,7 +77,7 @@ router.get('/tree', authenticateToken, async (req, res) => {
   }
 });
 
-// Reinvest referral balance into investment
+// ✅ Reinvest referral balance into investment
 router.post('/reinvest', authenticateToken, async (req, res) => {
   const { amount, planId } = req.body;
   try {
@@ -81,7 +86,7 @@ router.post('/reinvest', authenticateToken, async (req, res) => {
       planId,
       amount: parseFloat(amount)
     });
-    res.json(result);
+    res.json({ success: true, ...result });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
