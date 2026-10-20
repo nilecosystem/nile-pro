@@ -1,0 +1,31 @@
+{
+  "name": "Nile Ecosystem",
+  "displayName": "Nile",
+  "expo": {
+    "slug": "nile-ecosystem",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logos/mobile-logo.png",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#0F172A"
+    },
+    "updates": {
+      "enabled": true,
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logos/mobile-logo.png",
+        "backgroundColor": "#1E40AF"
+      }
+    },
+    "ios": {
+      "supportsTablet": true
+    }
+  }
+}
