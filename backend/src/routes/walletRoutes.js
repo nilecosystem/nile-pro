@@ -1,3 +1,4 @@
+// src/backend/main/routes/walletRoutes.js
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
@@ -5,7 +6,7 @@ const walletService = require('../services/walletService');
 const withdrawalService = require('../services/withdrawalService');
 const prisma = require('../utils/prisma');
 
-// Get all 4 wallets for current user
+// ✅ Get all wallets for current user
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const wallets = await walletService.getUserWallets(req.user.id);
@@ -15,7 +16,7 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Deposit request with TXID
+// ✅ Deposit request with TXID
 router.post('/deposit', authenticateToken, async (req, res) => {
   const { walletType, amount, currency, txid, network } = req.body;
   try {
@@ -37,13 +38,17 @@ router.post('/deposit', authenticateToken, async (req, res) => {
   }
 });
 
-// Current withdrawal cycle status
+// ✅ Current withdrawal cycle status
 router.get('/cycles', authenticateToken, (req, res) => {
-  const status = withdrawalService.getCurrentCycleWindow();
-  res.json({ success: true, ...status });
+  try {
+    const status = withdrawalService.getCurrentCycleWindow();
+    res.json({ success: true, ...status });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
-// Request withdrawal
+// ✅ Request withdrawal
 router.post('/withdraw', authenticateToken, async (req, res) => {
   const { walletType, amount, currency, toAddress, network } = req.body;
   try {
@@ -65,7 +70,7 @@ router.post('/withdraw', authenticateToken, async (req, res) => {
   }
 });
 
-// Transfer funds internally
+// ✅ Transfer funds internally
 router.post('/transfer', authenticateToken, async (req, res) => {
   const { fromType, toType, amount, currency } = req.body;
   try {
@@ -82,7 +87,7 @@ router.post('/transfer', authenticateToken, async (req, res) => {
   }
 });
 
-// History of deposits and withdrawals
+// ✅ History of deposits and withdrawals
 router.get('/history', authenticateToken, async (req, res) => {
   try {
     const [deposits, withdrawals] = await Promise.all([
