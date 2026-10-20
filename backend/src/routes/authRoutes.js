@@ -1,3 +1,4 @@
+// src/backend/main/routes/authRoutes.js
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
@@ -8,9 +9,6 @@ const config = require('../config');
 const { authenticateToken } = require('../middleware/auth');
 const { initializeUserWallets } = require('../services/walletService');
 
-/**
- * Generate unique 8-character referral code
- */
 const generateReferralCode = () => {
   return 'NILE-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 };
@@ -59,7 +57,6 @@ router.post('/register', [
       }
     });
 
-    // Initialize all 4 ledger wallets
     await initializeUserWallets(user.id);
 
     const token = jwt.sign(
@@ -184,6 +181,13 @@ router.post('/kyc', authenticateToken, async (req, res) => {
       where: { id: req.user.id },
       data: { kycStatus: 'PENDING' }
     });
+
+    res.json({ success: true, message: 'KYC documents submitted for review.', kycDoc });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // Web3 Wallet Cryptographic Login / Auto-Registration
 router.post('/web3-login', async (req, res) => {
   const { address, signature, message, network = 'EVM' } = req.body;
@@ -237,12 +241,6 @@ router.post('/web3-login', async (req, res) => {
       },
       wallets
     });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-    res.json({ success: true, message: 'KYC documents submitted for review.', kycDoc });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
