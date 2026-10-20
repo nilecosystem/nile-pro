@@ -1,1 +1,27 @@
-@import "tailwindcss";
+/* src/index.css */
+
+/* ایمپورت فایل‌های استایل اصلی */
+@import './global.css';
+@import './layout.css';
+@import './header.css';
+@import './footer.css';
+
+/* اگر از SCSS استفاده می‌کنی */
+@import './variables.scss';
+
+/* تنظیمات پایه */
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Inter, Arial, sans-serif;
+  background-color: #0F172A; /* رنگ پس‌زمینه */
+  color: #FFFFFF;            /* رنگ متن */
+  height: 100%;
+}
+
+/* کلاس‌های عمومی */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
