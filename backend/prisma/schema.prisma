@@ -5,26 +5,27 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // In production, switch to "postgresql" and provide DATABASE_URL
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
   id                String            @id @default(uuid())
-  email             String            @unique
-  passwordHash      String
-  firstName         String
-  lastName          String
-  phone             String?
+  email             String?           @unique
+  phone             String?           @unique
+  googleId          String?           @unique   // برای ورود با Gmail
+  passwordHash      String?                      // اختیاری چون کاربر Google ممکنه پسورد نداشته باشه
+  firstName         String?
+  lastName          String?
   role              String            @default("USER") // USER, ADMIN, SUPER_ADMIN
-  kycStatus         String            @default("UNVERIFIED") // UNVERIFIED, PENDING, APPROVED, REJECTED
+  kycStatus         String            @default("UNVERIFIED")
   twoFactorEnabled  Boolean           @default(false)
   twoFactorSecret   String?
-  referralCode      String            @unique
+  referralCode      String?           @unique
   referredById      String?
   referredBy        User?             @relation("ReferralTree", fields: [referredById], references: [id])
   referrals         User[]            @relation("ReferralTree")
-  referralRank      String            @default("BRONZE") // BRONZE, SILVER, GOLD, PLATINUM, DIAMOND
+  referralRank      String            @default("BRONZE")
   preferredLanguage String            @default("en")
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
@@ -47,9 +48,9 @@ model Wallet {
   id          String        @id @default(uuid())
   userId      String
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type        String        // INTERNAL, INVESTMENT, REFERRAL, SHOP
+  type        String
   balance     Float         @default(0.0)
-  currency    String        @default("USDT") // USDT or NILE
+  currency    String        @default("USDT")
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -68,8 +69,8 @@ model Deposit {
   amount      Float
   currency    String        @default("USDT")
   txid        String        @unique
-  network     String        // TRC20, ERC20, BEP20, SOLANA
-  status      String        @default("PENDING") // PENDING, CONFIRMED, REJECTED
+  network     String
+  status      String        @default("PENDING")
   confirmedBy String?
   confirmedAt DateTime?
   createdAt   DateTime      @default(now())
@@ -85,9 +86,9 @@ model Withdrawal {
   currency     String       @default("USDT")
   toAddress    String
   network      String
-  status       String       @default("PENDING") // PENDING, APPROVED, REJECTED, PROCESSED
+  status       String       @default("PENDING")
   payoutTxid   String?
-  cycleWindow  String       // Cycle 1 (00:00-03:00), Cycle 2 (06:00-09:00), etc.
+  cycleWindow  String
   approvedBy   String?
   approvedAt   DateTime?
   rejectionReason String?
@@ -96,12 +97,12 @@ model Withdrawal {
 
 model InvestmentPlan {
   id                  String           @id @default(uuid())
-  planType            String           // ASSET_BASED, TIME_LOCKED, AMOUNT_TIER
+  planType            String
   name                String
   minDeposit          Float
   maxDeposit          Float?
   dailyProfitPercent  Float            @default(0.0)
-  lockDays            Int              @default(0) // 0 for flexible, or 30, 50, 100
+  lockDays            Int              @default(0)
   fixedRewardPercent  Float?           @default(0.0)
   isActive            Boolean          @default(true)
   description         String?
@@ -118,12 +119,12 @@ model UserInvestment {
   plan                 InvestmentPlan   @relation(fields: [planId], references: [id])
   amount               Float
   currency             String           @default("USDT")
-  paymentSource        String           @default("INTERNAL_WALLET") // INTERNAL_WALLET, NILE_TOKEN
-  fundedWithNile       Boolean          @default(false) // If funded with NILE -> profits 2x doubled!
+  paymentSource        String           @default("INTERNAL_WALLET")
+  fundedWithNile       Boolean          @default(false)
   dailyProfitPercent   Float
   dailyProfitAmount    Float
   totalProfitAccrued   Float            @default(0.0)
-  status               String           @default("ACTIVE") // ACTIVE, MATURED, WITHDRAWN
+  status               String           @default("ACTIVE")
   startDate            DateTime         @default(now())
   maturityDate         DateTime?
   lastProfitRun        DateTime         @default(now())
@@ -138,10 +139,10 @@ model NileStaking {
   userId         String
   user           User         @relation(fields: [userId], references: [id])
   amountNile     Float
-  lockDays       Int          // 30, 50, 100
-  bonusPercent   Float        // 50% for 30d, 100% for 50d, 250% for 100d
+  lockDays       Int
+  bonusPercent   Float
   rewardNile     Float
-  status         String       @default("ACTIVE") // ACTIVE, MATURED, CLAIMED
+  status         String       @default("ACTIVE")
   startDate      DateTime     @default(now())
   maturityDate   DateTime
   claimedAt      DateTime?
@@ -156,8 +157,8 @@ model ReferralEarning {
   referee        User             @relation("Referee", fields: [refereeId], references: [id])
   investmentId   String
   investment     UserInvestment   @relation(fields: [investmentId], references: [id])
-  level          Int              // 1 to 10
-  percent        Float            // 10% down to 1%
+  level          Int
+  percent        Float
   amount         Float
   reinvested     Boolean          @default(false)
   createdAt      DateTime         @default(now())
@@ -165,13 +166,13 @@ model ReferralEarning {
 
 model ShopProduct {
   id             String       @id @default(uuid())
-  category       String       // CRYPTO, SOFTWARE, FINANCIAL_SERVICES, AI_TOOLS
+  category       String
   title          String
   description    String
   priceUsdt      Float
   inventoryCount Int          @default(100)
   isAvailable    Boolean      @default(true)
-  metadata       String?      // JSON string for specific options (e.g., license type)
+  metadata       String?
   createdAt      DateTime     @default(now())
 
   orders         ShopOrder[]
@@ -184,7 +185,7 @@ model ShopOrder {
   productId       String
   product         ShopProduct  @relation(fields: [productId], references: [id])
   amountPaidUsdt  Float
-  status          String       @default("PENDING") // PENDING, DELIVERED, REJECTED
+  status          String       @default("PENDING")
   licenseKey      String?
   deliveryNotes   String?
   createdAt       DateTime     @default(now())
@@ -196,11 +197,11 @@ model TokenCreationRequest {
   user            User         @relation(fields: [userId], references: [id])
   tokenName       String
   tokenSymbol     String
-  network         String       // BEP20, ERC20, TRC20, SOLANA, SUI
+  network         String
   decimals        Int          @default(18)
   totalSupply     Float
-  extraFeatures   String?      // Mintable, Burnable, Tax, Blacklist
-  status          String       @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, REJECTED
+  extraFeatures   String?
+  status          String       @default("PENDING")
   priceQuotedUsdt Float        @default(499.0)
   deployedAddress String?
   notes           String?
@@ -211,7 +212,7 @@ model AcademyArticle {
   id              String       @id @default(uuid())
   title           String
   slug            String       @unique
-  category        String       // CRYPTO_BASICS, INVESTMENT, SECURITY, GUIDES, FAQ
+  category        String
   language        String       @default("en")
   summary         String
   contentMarkdown String
@@ -227,9 +228,9 @@ model AdminAuditLog {
   admin           User         @relation("AdminUser", fields: [adminId], references: [id])
   targetUserId    String?
   targetUser      User?        @relation("TargetUser", fields: [targetUserId], references: [id])
-  actionType      String       // BALANCE_ADJUST, KYC_APPROVE, WITHDRAW_APPROVE, PLAN_MODIFY, LOGIN_AS_USER, etc.
-  beforeValue     String?      // JSON string
-  afterValue      String?      // JSON string
+  actionType      String
+  beforeValue     String?
+  afterValue      String?
   reason          String
   ipAddress       String?
   userAgent       String?
@@ -240,12 +241,12 @@ model KycDocument {
   id              String       @id @default(uuid())
   userId          String
   user            User         @relation(fields: [userId], references: [id])
-  idType          String       // PASSPORT, NATIONAL_ID, DRIVERS_LICENSE
+  idType          String
   idNumber        String
   frontImageUrl   String
   backImageUrl    String?
   selfieUrl       String?
-  status          String       @default("PENDING") // PENDING, APPROVED, REJECTED
+  status          String       @default("PENDING")
   adminNotes      String?
   reviewedAt      DateTime?
   createdAt       DateTime     @default(now())
