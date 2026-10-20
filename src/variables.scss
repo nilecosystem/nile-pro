@@ -1,0 +1,27 @@
+/* src/variables.scss */
+
+/* 🎨 رنگ‌ها */
+$color-primary: #0a0a0a;    // رنگ اصلی (تیره)
+$color-secondary: #ffd700;  // طلایی
+$color-accent: #1e90ff;     // آبی برای جزئیات
+$color-text: #ffffff;       // متن روشن
+$color-muted: #aaaaaa;      // متن کم‌رنگ
+
+/* 🔤 فونت‌ها */
+$font-family-base: 'Inter', sans-serif;
+$font-size-base: 16px;
+$font-size-small: 14px;
+$font-size-large: 20px;
+
+/* 📐 فاصله‌ها */
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 32px;
+$spacing-xl: 64px;
+
+/* 📱 Breakpoints برای ریسپانسیو */
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
