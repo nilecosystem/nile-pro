@@ -3,19 +3,17 @@ const config = require('../config');
 
 /**
  * Identify the current active withdrawal cycle window
- * 4 cycles per day, 3 hours open window each
  */
 const getCurrentCycleWindow = () => {
   const currentHour = new Date().getUTCHours();
   const cycles = config.withdrawalCycles;
-  
+
   for (const cycle of cycles) {
     if (currentHour >= cycle.startHour && currentHour < cycle.endHour) {
       return { active: true, cycle: cycle.name, cycleId: cycle.id };
     }
   }
 
-  // Find next upcoming cycle
   const nextCycle = cycles.find(c => c.startHour > currentHour) || cycles[0];
   return {
     active: false,
@@ -28,17 +26,14 @@ const getCurrentCycleWindow = () => {
  * Submit withdrawal request
  */
 const requestWithdrawal = async ({ userId, walletType = 'INTERNAL', amount, currency = 'USDT', toAddress, network }) => {
-  if (!prisma) throw new Error('Database unavailable');
   if (amount <= 0) throw new Error('Withdrawal amount must be positive.');
   if (!toAddress) throw new Error('Destination wallet address is required.');
 
-  // Check 4 daily cycles window
   const cycleInfo = getCurrentCycleWindow();
   const currentCycleTag = cycleInfo.active ? cycleInfo.cycle : `Off-cycle Request (Queued for ${cycleInfo.nextCycle.name})`;
 
-  // Referral wallet rule: Cannot withdraw directly from Referral wallet without reinvesting
   if (walletType === 'REFERRAL') {
-    throw new Error('Referral wallet balances must be reinvested into active plans before withdrawal.');
+    throw new Error('Referral wallet balances must be reinvested before withdrawal.');
   }
 
   const wallet = await prisma.wallet.findUnique({
@@ -46,90 +41,53 @@ const requestWithdrawal = async ({ userId, walletType = 'INTERNAL', amount, curr
   });
 
   if (!wallet || wallet.balance < amount) {
-    throw new Error(`Insufficient funds in ${walletType} wallet. Available balance: ${wallet ? wallet.balance : 0} ${currency}`);
+    throw new Error(`Insufficient funds in ${walletType} wallet. Available: ${wallet ? wallet.balance : 0} ${currency}`);
   }
 
-  // Deduct balance and create PENDING withdrawal request
-  return await prisma.$transaction(async (tx) => {
-    await tx.wallet.update({
-      where: { id: wallet.id },
-      data: { balance: { decrement: amount } }
-    });
-
-    return await tx.withdrawal.create({
-      data: {
-        userId,
-        walletId: wallet.id,
-        amount,
-        currency,
-        toAddress,
-        network: network || 'TRC20',
-        cycleWindow: currentCycleTag,
-        status: 'PENDING'
-      }
+  const withdrawal = await prisma.$transaction(async (tx) => {
+    await tx.wallet.update({ where: { id: wallet.id }, data: { balance: { decrement: amount } } });
+    return tx.withdrawal.create({
+      data: { userId, walletId: wallet.id, amount, currency, toAddress, network: network || 'TRC20', cycleWindow: currentCycleTag, status: 'PENDING' }
     });
   });
+
+  return { success: true, message: 'Withdrawal request submitted.', withdrawal };
 };
 
 /**
- * Admin manual approval with TXID recording
+ * Admin manual approval
  */
 const approveWithdrawal = async ({ withdrawalId, adminId, payoutTxid, reason = 'Admin approved payout' }) => {
-  if (!prisma) throw new Error('Database unavailable');
-  if (!payoutTxid) throw new Error('Recorded payout TXID is required for approval.');
+  if (!payoutTxid) throw new Error('Payout TXID is required.');
 
-  const withdrawal = await prisma.withdrawal.findUnique({
-    where: { id: withdrawalId }
-  });
+  const withdrawal = await prisma.withdrawal.findUnique({ where: { id: withdrawalId } });
+  if (!withdrawal) throw new Error('Withdrawal not found.');
+  if (withdrawal.status !== 'PENDING') throw new Error(`Already ${withdrawal.status}.`);
 
-  if (!withdrawal) throw new Error('Withdrawal request not found.');
-  if (withdrawal.status !== 'PENDING') throw new Error(`Withdrawal already ${withdrawal.status}.`);
-
-  return await prisma.withdrawal.update({
+  const updated = await prisma.withdrawal.update({
     where: { id: withdrawalId },
-    data: {
-      status: 'APPROVED',
-      payoutTxid,
-      approvedBy: adminId,
-      approvedAt: new Date()
-    }
+    data: { status: 'APPROVED', payoutTxid, approvedBy: adminId, approvedAt: new Date(), approvalNotes: reason }
   });
+
+  return { success: true, message: 'Withdrawal approved.', withdrawal: updated };
 };
 
 /**
- * Admin reject withdrawal and refund wallet balance
+ * Admin reject withdrawal and refund wallet
  */
 const rejectWithdrawal = async ({ withdrawalId, adminId, rejectionReason = 'Rejected by compliance' }) => {
-  if (!prisma) throw new Error('Database unavailable');
+  const withdrawal = await prisma.withdrawal.findUnique({ where: { id: withdrawalId } });
+  if (!withdrawal || withdrawal.status !== 'PENDING') throw new Error('Invalid or already processed withdrawal.');
 
-  const withdrawal = await prisma.withdrawal.findUnique({
-    where: { id: withdrawalId }
-  });
-
-  if (!withdrawal || withdrawal.status !== 'PENDING') {
-    throw new Error('Invalid or already processed withdrawal.');
-  }
-
-  return await prisma.$transaction([
-    prisma.wallet.update({
-      where: { id: withdrawal.walletId },
-      data: { balance: { increment: withdrawal.amount } }
-    }),
+  const [walletRefunded, withdrawalUpdated] = await prisma.$transaction([
+    prisma.wallet.update({ where: { id: withdrawal.walletId }, data: { balance: { increment: withdrawal.amount } } }),
     prisma.withdrawal.update({
       where: { id: withdrawalId },
-      data: {
-        status: 'REJECTED',
-        rejectionReason,
-        approvedBy: adminId,
-        approvedAt: new Date()
-      }
+      data: { status: 'REJECTED', rejectionReason, approvedBy: adminId, approvedAt: new Date() }
     })
   ]);
+
+  return { success: true, message: 'Withdrawal rejected and funds refunded.', wallet: walletRefunded, withdrawal: withdrawalUpdated };
 };
 
-module.exports = {
-  getCurrentCycleWindow,
-  requestWithdrawal,
-  approveWithdrawal,
-  rejectWithdrawal
-};
+module.exports = { getCurrentCycleWindow, requestWithdrawal, approveWithdrawal, rejectWithdrawal };

@@ -1,0 +1,6 @@
+{
+  "name": "Nile Ecosystem",
+  "description": "The Unified Digital Finance Ecosystem — Nile Crypto Bank, Nile Investment, Nile Marketplace, Nile DEX, NILE Token, and Token Presale.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
