@@ -1,0 +1,335 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024' width='1024' height='1024'>
+  <defs>
+    <!-- Background / Glow Gradients -->
+    <radialGradient id='ambient-glow' cx='50%' cy='50%' r='50%'>
+      <stop offset='0%' stop-color='#F5D061' stop-opacity='0.45'/>
+      <stop offset='45%' stop-color='#D4AF37' stop-opacity='0.2'/>
+      <stop offset='80%' stop-color='#996F00' stop-opacity='0.05'/>
+      <stop offset='100%' stop-color='#030611' stop-opacity='0'/>
+    </radialGradient>
+
+    <!-- Outer Rim Gold Gradients -->
+    <linearGradient id='rim-gold-1' x1='15%' y1='5%' x2='85%' y2='95%'>
+      <stop offset='0%' stop-color='#FFF8D6'/>
+      <stop offset='15%' stop-color='#F3DF79'/>
+      <stop offset='35%' stop-color='#D4AF37'/>
+      <stop offset='55%' stop-color='#996F00'/>
+      <stop offset='75%' stop-color='#E5B842'/>
+      <stop offset='90%' stop-color='#FFF2A3'/>
+      <stop offset='100%' stop-color='#7A5300'/>
+    </linearGradient>
+
+    <linearGradient id='rim-gold-2' x1='85%' y1='95%' x2='15%' y2='5%'>
+      <stop offset='0%' stop-color='#5A3B00'/>
+      <stop offset='25%' stop-color='#996F00'/>
+      <stop offset='50%' stop-color='#E5B842'/>
+      <stop offset='75%' stop-color='#FFF6C7'/>
+      <stop offset='100%' stop-color='#D4AF37'/>
+    </linearGradient>
+
+    <!-- Inner Core Obsidian / Royal Navy -->
+    <radialGradient id='coin-bed' cx='45%' cy='40%' r='60%'>
+      <stop offset='0%' stop-color='#162544'/>
+      <stop offset='40%' stop-color='#0B1426'/>
+      <stop offset='75%' stop-color='#060B16'/>
+      <stop offset='100%' stop-color='#020409'/>
+    </radialGradient>
+
+    <!-- 3D Horus Relief Gold -->
+    <linearGradient id='relief-gold' x1='0%' y1='0%' x2='100%' y2='100%'>
+      <stop offset='0%' stop-color='#FFFBE0'/>
+      <stop offset='20%' stop-color='#FCE183'/>
+      <stop offset='45%' stop-color='#E5B842'/>
+      <stop offset='70%' stop-color='#B8860B'/>
+      <stop offset='90%' stop-color='#D4AF37'/>
+      <stop offset='100%' stop-color='#704A00'/>
+    </linearGradient>
+
+    <linearGradient id='relief-highlight' x1='30%' y1='0%' x2='70%' y2='100%'>
+      <stop offset='0%' stop-color='#FFFFFF' stop-opacity='0.9'/>
+      <stop offset='30%' stop-color='#FFF2A3' stop-opacity='0.5'/>
+      <stop offset='100%' stop-color='#D4AF37' stop-opacity='0'/>
+    </linearGradient>
+
+    <linearGradient id='cyan-accent' x1='0%' y1='0%' x2='100%' y2='100%'>
+      <stop offset='0%' stop-color='#00FFC2'/>
+      <stop offset='100%' stop-color='#00A3FF'/>
+    </linearGradient>
+
+    <!-- Filters for Depth and Metallic Sheen -->
+    <filter id='drop-shadow' x='-15%' y='-15%' width='130%' height='130%'>
+      <feDropShadow dx='0' dy='16' stdDeviation='24' flood-color='#000000' flood-opacity='0.75'/>
+      <feDropShadow dx='0' dy='4' stdDeviation='8' flood-color='#E5B842' flood-opacity='0.35'/>
+    </filter>
+
+    <filter id='relief-shadow' x='-20%' y='-20%' width='140%' height='140%'>
+      <feDropShadow dx='4' dy='8' stdDeviation='6' flood-color='#000000' flood-opacity='0.85'/>
+      <feDropShadow dx='-2' dy='-2' stdDeviation='3' flood-color='#FFF8D6' flood-opacity='0.5'/>
+    </filter>
+
+    <filter id='eye-glow' x='-30%' y='-30%' width='160%' height='160%'>
+      <feGaussianBlur stdDeviation='8' result='blur'/>
+      <feComposite in='SourceGraphic' in2='blur' operator='over'/>
+    </filter>
+  </defs>
+
+  <!-- Ambient Outer Glow -->
+  <circle cx='512' cy='512' r='490' fill='url(#ambient-glow)' />
+
+  <!-- Master Coin Container with Drop Shadow -->
+  <g filter='url(#drop-shadow)'>
+    <!-- Outer Reeded Fluting (Notches around outer rim) -->
+    <circle cx='512' cy='512' r='456' fill='url(#rim-gold-1)' />
+    <circle cx='512' cy='512' r='452' fill='url(#rim-gold-2)' />
+
+    <!-- Reeded Edges (Coin notches) -->
+    <g stroke='url(#relief-gold)' stroke-width='4' opacity='0.7'>
+      <line x1='952.0' y1='512.0' x2='964.0' y2='512.0' />
+<line x1='951.4' y1='535.0' x2='963.4' y2='535.7' />
+<line x1='949.6' y1='558.0' x2='961.5' y2='559.2' />
+<line x1='946.6' y1='580.8' x2='958.4' y2='582.7' />
+<line x1='942.4' y1='603.5' x2='954.1' y2='606.0' />
+<line x1='937.0' y1='625.9' x2='948.6' y2='629.0' />
+<line x1='930.5' y1='648.0' x2='941.9' y2='651.7' />
+<line x1='922.8' y1='669.7' x2='934.0' y2='674.0' />
+<line x1='914.0' y1='691.0' x2='924.9' y2='695.8' />
+<line x1='904.0' y1='711.8' x2='914.7' y2='717.2' />
+<line x1='893.1' y1='732.0' x2='903.4' y2='738.0' />
+<line x1='881.0' y1='751.6' x2='891.1' y2='758.2' />
+<line x1='868.0' y1='770.6' x2='877.7' y2='777.7' />
+<line x1='853.9' y1='788.9' x2='863.3' y2='796.5' />
+<line x1='839.0' y1='806.4' x2='847.9' y2='814.4' />
+<line x1='823.1' y1='823.1' x2='831.6' y2='831.6' />
+<line x1='806.4' y1='839.0' x2='814.4' y2='847.9' />
+<line x1='788.9' y1='853.9' x2='796.5' y2='863.3' />
+<line x1='770.6' y1='868.0' x2='777.7' y2='877.7' />
+<line x1='751.6' y1='881.0' x2='758.2' y2='891.1' />
+<line x1='732.0' y1='893.1' x2='738.0' y2='903.4' />
+<line x1='711.8' y1='904.0' x2='717.2' y2='914.7' />
+<line x1='691.0' y1='914.0' x2='695.8' y2='924.9' />
+<line x1='669.7' y1='922.8' x2='674.0' y2='934.0' />
+<line x1='648.0' y1='930.5' x2='651.7' y2='941.9' />
+<line x1='625.9' y1='937.0' x2='629.0' y2='948.6' />
+<line x1='603.5' y1='942.4' x2='606.0' y2='954.1' />
+<line x1='580.8' y1='946.6' x2='582.7' y2='958.4' />
+<line x1='558.0' y1='949.6' x2='559.2' y2='961.5' />
+<line x1='535.0' y1='951.4' x2='535.7' y2='963.4' />
+<line x1='512.0' y1='952.0' x2='512.0' y2='964.0' />
+<line x1='489.0' y1='951.4' x2='488.3' y2='963.4' />
+<line x1='466.0' y1='949.6' x2='464.8' y2='961.5' />
+<line x1='443.2' y1='946.6' x2='441.3' y2='958.4' />
+<line x1='420.5' y1='942.4' x2='418.0' y2='954.1' />
+<line x1='398.1' y1='937.0' x2='395.0' y2='948.6' />
+<line x1='376.0' y1='930.5' x2='372.3' y2='941.9' />
+<line x1='354.3' y1='922.8' x2='350.0' y2='934.0' />
+<line x1='333.0' y1='914.0' x2='328.2' y2='924.9' />
+<line x1='312.2' y1='904.0' x2='306.8' y2='914.7' />
+<line x1='292.0' y1='893.1' x2='286.0' y2='903.4' />
+<line x1='272.4' y1='881.0' x2='265.8' y2='891.1' />
+<line x1='253.4' y1='868.0' x2='246.3' y2='877.7' />
+<line x1='235.1' y1='853.9' x2='227.5' y2='863.3' />
+<line x1='217.6' y1='839.0' x2='209.6' y2='847.9' />
+<line x1='200.9' y1='823.1' x2='192.4' y2='831.6' />
+<line x1='185.0' y1='806.4' x2='176.1' y2='814.4' />
+<line x1='170.1' y1='788.9' x2='160.7' y2='796.5' />
+<line x1='156.0' y1='770.6' x2='146.3' y2='777.7' />
+<line x1='143.0' y1='751.6' x2='132.9' y2='758.2' />
+<line x1='130.9' y1='732.0' x2='120.6' y2='738.0' />
+<line x1='120.0' y1='711.8' x2='109.3' y2='717.2' />
+<line x1='110.0' y1='691.0' x2='99.1' y2='695.8' />
+<line x1='101.2' y1='669.7' x2='90.0' y2='674.0' />
+<line x1='93.5' y1='648.0' x2='82.1' y2='651.7' />
+<line x1='87.0' y1='625.9' x2='75.4' y2='629.0' />
+<line x1='81.6' y1='603.5' x2='69.9' y2='606.0' />
+<line x1='77.4' y1='580.8' x2='65.6' y2='582.7' />
+<line x1='74.4' y1='558.0' x2='62.5' y2='559.2' />
+<line x1='72.6' y1='535.0' x2='60.6' y2='535.7' />
+<line x1='72.0' y1='512.0' x2='60.0' y2='512.0' />
+<line x1='72.6' y1='489.0' x2='60.6' y2='488.3' />
+<line x1='74.4' y1='466.0' x2='62.5' y2='464.8' />
+<line x1='77.4' y1='443.2' x2='65.6' y2='441.3' />
+<line x1='81.6' y1='420.5' x2='69.9' y2='418.0' />
+<line x1='87.0' y1='398.1' x2='75.4' y2='395.0' />
+<line x1='93.5' y1='376.0' x2='82.1' y2='372.3' />
+<line x1='101.2' y1='354.3' x2='90.0' y2='350.0' />
+<line x1='110.0' y1='333.0' x2='99.1' y2='328.2' />
+<line x1='120.0' y1='312.2' x2='109.3' y2='306.8' />
+<line x1='130.9' y1='292.0' x2='120.6' y2='286.0' />
+<line x1='143.0' y1='272.4' x2='132.9' y2='265.8' />
+<line x1='156.0' y1='253.4' x2='146.3' y2='246.3' />
+<line x1='170.1' y1='235.1' x2='160.7' y2='227.5' />
+<line x1='185.0' y1='217.6' x2='176.1' y2='209.6' />
+<line x1='200.9' y1='200.9' x2='192.4' y2='192.4' />
+<line x1='217.6' y1='185.0' x2='209.6' y2='176.1' />
+<line x1='235.1' y1='170.1' x2='227.5' y2='160.7' />
+<line x1='253.4' y1='156.0' x2='246.3' y2='146.3' />
+<line x1='272.4' y1='143.0' x2='265.8' y2='132.9' />
+<line x1='292.0' y1='130.9' x2='286.0' y2='120.6' />
+<line x1='312.2' y1='120.0' x2='306.8' y2='109.3' />
+<line x1='333.0' y1='110.0' x2='328.2' y2='99.1' />
+<line x1='354.3' y1='101.2' x2='350.0' y2='90.0' />
+<line x1='376.0' y1='93.5' x2='372.3' y2='82.1' />
+<line x1='398.1' y1='87.0' x2='395.0' y2='75.4' />
+<line x1='420.5' y1='81.6' x2='418.0' y2='69.9' />
+<line x1='443.2' y1='77.4' x2='441.3' y2='65.6' />
+<line x1='466.0' y1='74.4' x2='464.8' y2='62.5' />
+<line x1='489.0' y1='72.6' x2='488.3' y2='60.6' />
+<line x1='512.0' y1='72.0' x2='512.0' y2='60.0' />
+<line x1='535.0' y1='72.6' x2='535.7' y2='60.6' />
+<line x1='558.0' y1='74.4' x2='559.2' y2='62.5' />
+<line x1='580.8' y1='77.4' x2='582.7' y2='65.6' />
+<line x1='603.5' y1='81.6' x2='606.0' y2='69.9' />
+<line x1='625.9' y1='87.0' x2='629.0' y2='75.4' />
+<line x1='648.0' y1='93.5' x2='651.7' y2='82.1' />
+<line x1='669.7' y1='101.2' x2='674.0' y2='90.0' />
+<line x1='691.0' y1='110.0' x2='695.8' y2='99.1' />
+<line x1='711.8' y1='120.0' x2='717.2' y2='109.3' />
+<line x1='732.0' y1='130.9' x2='738.0' y2='120.6' />
+<line x1='751.6' y1='143.0' x2='758.2' y2='132.9' />
+<line x1='770.6' y1='156.0' x2='777.7' y2='146.3' />
+<line x1='788.9' y1='170.1' x2='796.5' y2='160.7' />
+<line x1='806.4' y1='185.0' x2='814.4' y2='176.1' />
+<line x1='823.1' y1='200.9' x2='831.6' y2='192.4' />
+<line x1='839.0' y1='217.6' x2='847.9' y2='209.6' />
+<line x1='853.9' y1='235.1' x2='863.3' y2='227.5' />
+<line x1='868.0' y1='253.4' x2='877.7' y2='246.3' />
+<line x1='881.0' y1='272.4' x2='891.1' y2='265.8' />
+<line x1='893.1' y1='292.0' x2='903.4' y2='286.0' />
+<line x1='904.0' y1='312.2' x2='914.7' y2='306.8' />
+<line x1='914.0' y1='333.0' x2='924.9' y2='328.2' />
+<line x1='922.8' y1='354.3' x2='934.0' y2='350.0' />
+<line x1='930.5' y1='376.0' x2='941.9' y2='372.3' />
+<line x1='937.0' y1='398.1' x2='948.6' y2='395.0' />
+<line x1='942.4' y1='420.5' x2='954.1' y2='418.0' />
+<line x1='946.6' y1='443.2' x2='958.4' y2='441.3' />
+<line x1='949.6' y1='466.0' x2='961.5' y2='464.8' />
+<line x1='951.4' y1='489.0' x2='963.4' y2='488.3' />
+    </g>
+
+    <!-- Outer Bevel Ring -->
+    <circle cx='512' cy='512' r='436' fill='none' stroke='url(#rim-gold-1)' stroke-width='14' />
+    <circle cx='512' cy='512' r='424' fill='none' stroke='#4D3200' stroke-width='4' />
+
+    <!-- Inscription Track Ring -->
+    <circle cx='512' cy='512' r='404' fill='none' stroke='url(#rim-gold-2)' stroke-width='34' opacity='0.95' />
+    <circle cx='512' cy='512' r='384' fill='none' stroke='url(#rim-gold-1)' stroke-width='6' />
+
+    <!-- Inscription Text Along Top and Bottom Arcs -->
+    <path id='top-arc' d='M 180 512 A 332 332 0 0 1 844 512' fill='none' />
+    <path id='bottom-arc' d='M 844 512 A 332 332 0 0 1 180 512' fill='none' />
+
+    <!-- Coin Bed Floor (Obsidian Core with Micro Lathe Grooves) -->
+    <circle cx='512' cy='512' r='376' fill='url(#coin-bed)' />
+    
+    <!-- Micro Lathe Concentric Grooves -->
+    <circle cx='512' cy='512' r='360' fill='none' stroke='#E5B842' stroke-width='1' opacity='0.2' />
+    <circle cx='512' cy='512' r='340' fill='none' stroke='#E5B842' stroke-width='1' opacity='0.15' />
+    <circle cx='512' cy='512' r='320' fill='none' stroke='#E5B842' stroke-width='1' opacity='0.15' />
+    <circle cx='512' cy='512' r='300' fill='none' stroke='#E5B842' stroke-width='1' opacity='0.2' />
+
+    <!-- Radial Geometric Sunburst behind Horus -->
+    <g stroke='url(#relief-gold)' stroke-width='2' opacity='0.25'>
+      <line x1='612.0' y1='512.0' x2='880.0' y2='512.0' stroke-dasharray='4,8'/>
+<line x1='610.1' y1='531.5' x2='872.9' y2='583.8' stroke-dasharray='4,8'/>
+<line x1='604.4' y1='550.3' x2='852.0' y2='652.8' stroke-dasharray='4,8'/>
+<line x1='595.1' y1='567.6' x2='818.0' y2='716.4' stroke-dasharray='4,8'/>
+<line x1='582.7' y1='582.7' x2='772.2' y2='772.2' stroke-dasharray='4,8'/>
+<line x1='567.6' y1='595.1' x2='716.4' y2='818.0' stroke-dasharray='4,8'/>
+<line x1='550.3' y1='604.4' x2='652.8' y2='852.0' stroke-dasharray='4,8'/>
+<line x1='531.5' y1='610.1' x2='583.8' y2='872.9' stroke-dasharray='4,8'/>
+<line x1='512.0' y1='612.0' x2='512.0' y2='880.0' stroke-dasharray='4,8'/>
+<line x1='492.5' y1='610.1' x2='440.2' y2='872.9' stroke-dasharray='4,8'/>
+<line x1='473.7' y1='604.4' x2='371.2' y2='852.0' stroke-dasharray='4,8'/>
+<line x1='456.4' y1='595.1' x2='307.6' y2='818.0' stroke-dasharray='4,8'/>
+<line x1='441.3' y1='582.7' x2='251.8' y2='772.2' stroke-dasharray='4,8'/>
+<line x1='428.9' y1='567.6' x2='206.0' y2='716.4' stroke-dasharray='4,8'/>
+<line x1='419.6' y1='550.3' x2='172.0' y2='652.8' stroke-dasharray='4,8'/>
+<line x1='413.9' y1='531.5' x2='151.1' y2='583.8' stroke-dasharray='4,8'/>
+<line x1='412.0' y1='512.0' x2='144.0' y2='512.0' stroke-dasharray='4,8'/>
+<line x1='413.9' y1='492.5' x2='151.1' y2='440.2' stroke-dasharray='4,8'/>
+<line x1='419.6' y1='473.7' x2='172.0' y2='371.2' stroke-dasharray='4,8'/>
+<line x1='428.9' y1='456.4' x2='206.0' y2='307.6' stroke-dasharray='4,8'/>
+<line x1='441.3' y1='441.3' x2='251.8' y2='251.8' stroke-dasharray='4,8'/>
+<line x1='456.4' y1='428.9' x2='307.6' y2='206.0' stroke-dasharray='4,8'/>
+<line x1='473.7' y1='419.6' x2='371.2' y2='172.0' stroke-dasharray='4,8'/>
+<line x1='492.5' y1='413.9' x2='440.2' y2='151.1' stroke-dasharray='4,8'/>
+<line x1='512.0' y1='412.0' x2='512.0' y2='144.0' stroke-dasharray='4,8'/>
+<line x1='531.5' y1='413.9' x2='583.8' y2='151.1' stroke-dasharray='4,8'/>
+<line x1='550.3' y1='419.6' x2='652.8' y2='172.0' stroke-dasharray='4,8'/>
+<line x1='567.6' y1='428.9' x2='716.4' y2='206.0' stroke-dasharray='4,8'/>
+<line x1='582.7' y1='441.3' x2='772.2' y2='251.8' stroke-dasharray='4,8'/>
+<line x1='595.1' y1='456.4' x2='818.0' y2='307.6' stroke-dasharray='4,8'/>
+<line x1='604.4' y1='473.7' x2='852.0' y2='371.2' stroke-dasharray='4,8'/>
+<line x1='610.1' y1='492.5' x2='872.9' y2='440.2' stroke-dasharray='4,8'/>
+    </g>
+
+    <!-- CENTRAL 3D SCULPTURED HORUS & PYRAMID EMBLEM -->
+    <g filter='url(#relief-shadow)'>
+      <!-- 1. The Royal Egyptian Horus Headdress / Wings Crown -->
+      <path d='M512 210 C420 210 350 250 320 310 C380 290 480 290 512 290 C544 290 644 290 704 310 C674 250 604 210 512 210 Z' 
+            fill='url(#relief-gold)' stroke='#543700' stroke-width='4' />
+      <path d='M512 220 C440 220 380 255 350 295 C410 280 480 282 512 282 C544 282 614 280 674 295 C644 255 584 220 512 220 Z' 
+            fill='url(#relief-highlight)' opacity='0.6' />
+
+      <!-- 2. The Divine Eye of Horus Motif -->
+      <!-- Eye Contour Outer Sclera -->
+      <path d='M512 250 C460 250 420 280 395 315 C420 350 460 375 512 375 C564 375 604 350 629 315 C604 280 564 250 512 250 Z' 
+            fill='#08101E' stroke='url(#relief-gold)' stroke-width='12' />
+      <!-- Inner Gold Iris Ring -->
+      <circle cx='512' cy='315' r='38' fill='url(#relief-gold)' stroke='#4A3200' stroke-width='4' />
+      <!-- Cyan All-Seeing Pupil with Filter Glow -->
+      <circle cx='512' cy='315' r='20' fill='url(#cyan-accent)' filter='url(#eye-glow)' />
+      <circle cx='518' cy='309' r='6' fill='#FFFFFF' opacity='0.9' />
+      <!-- Horus Teardrop & Falcon Markings -->
+      <path d='M480 372 C485 410 470 440 450 455' stroke='url(#relief-gold)' stroke-width='10' stroke-linecap='round' fill='none' />
+      <path d='M544 372 C550 420 580 435 600 425' stroke='url(#relief-gold)' stroke-width='10' stroke-linecap='round' fill='none' />
+
+      <!-- 3. Faceted Chiseled Monogram 'N' (NILE) -->
+      <!-- Left Stem of N -->
+      <polygon points='328,470 384,470 372,700 316,700' fill='url(#relief-gold)' stroke='#5C3D00' stroke-width='4' />
+      <polygon points='334,476 354,476 344,694 324,694' fill='url(#relief-highlight)' opacity='0.5' />
+
+      <!-- Right Stem of N -->
+      <polygon points='640,470 696,470 684,700 628,700' fill='url(#relief-gold)' stroke='#5C3D00' stroke-width='4' />
+      <polygon points='646,476 666,476 656,694 636,694' fill='url(#relief-highlight)' opacity='0.5' />
+
+      <!-- Dynamic Diagonal Chiseled Cross-Beam of N -->
+      <polygon points='368,470 440,470 656,700 584,700' fill='url(#relief-gold)' stroke='#5C3D00' stroke-width='5' />
+      <polygon points='376,476 414,476 626,694 590,694' fill='url(#relief-highlight)' opacity='0.7' />
+
+      <!-- 4. Sacred Stepped Pyramid of Giza (Base Foundation) -->
+      <!-- Pyramid Apex Triangle -->
+      <polygon points='512,650 360,790 664,790' fill='url(#relief-gold)' stroke='#5A3C00' stroke-width='6' />
+      <!-- Pyramid Central Meridian Ridge -->
+      <line x1='512' y1='650' x2='512' y2='790' stroke='#382400' stroke-width='6' />
+      <!-- Left Shaded Face -->
+      <polygon points='512,650 360,790 512,790' fill='#996F00' opacity='0.45' />
+      <!-- Right Illuminated Face -->
+      <polygon points='512,650 512,790 664,790' fill='url(#relief-highlight)' opacity='0.3' />
+
+      <!-- Stepped Horizontal Masonry Courses of the Pyramid -->
+      <line x1='480' y1='680' x2='544' y2='680' stroke='#4A3200' stroke-width='4' />
+      <line x1='450' y1='710' x2='574' y2='710' stroke='#4A3200' stroke-width='4' />
+      <line x1='415' y1='740' x2='609' y2='740' stroke='#4A3200' stroke-width='4' />
+      <line x1='385' y1='770' x2='639' y2='770' stroke='#4A3200' stroke-width='4' />
+      <!-- Glowing Radiant Capstone (Benben Stone) -->
+      <polygon points='512,650 488,675 536,675' fill='#FFFFFF' opacity='0.9' filter='url(#eye-glow)' />
+    </g>
+
+    <!-- Top & Bottom Arc Text (Embossed Curving Inscription) -->
+    <text font-family='sans-serif' font-weight='900' font-size='26' fill='url(#relief-gold)' letter-spacing='7' filter='url(#relief-shadow)'>
+      <textPath href='#top-arc' startOffset='50%' text-anchor='middle'>
+        ★ NILE ECOSYSTEM ★ WEALTH RESERVE ★
+      </textPath>
+    </text>
+
+    <text font-family='sans-serif' font-weight='900' font-size='24' fill='url(#relief-gold)' letter-spacing='6' filter='url(#relief-shadow)'>
+      <textPath href='#bottom-arc' startOffset='50%' text-anchor='middle'>
+        ★ 500,000,000 FIXED SUPPLY · NCB ★
+      </textPath>
+    </text>
+
+    <!-- Diagonal Master Specular Sheen (Curved Luxury Highlight) -->
+    <path d='M 220 240 Q 512 140 804 240 Q 512 360 220 240 Z' fill='url(#relief-highlight)' opacity='0.35' pointer-events='none' />
+  </g>
+</svg>

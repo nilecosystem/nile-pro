@@ -1,3 +1,13 @@
+<<<<<<< HEAD
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+=======
 # Dependencies
 node_modules/
 .pnp
@@ -60,3 +70,4 @@ coverage/
 .parcel-cache/
 .turbo/
 EOF
+>>>>>>> c8e6a1d5158bca5c59da9cc43a8d83d4c1f2e507

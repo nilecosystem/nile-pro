@@ -1,3 +1,25 @@
+<<<<<<< HEAD
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
+
+# Run and deploy your AI Studio app
+
+This contains everything you need to run your app locally.
+
+View your app in AI Studio: https://ai.studio/apps/79a27c1a-2620-4969-98fc-993f16c59dc5
+
+## Run Locally
+
+**Prerequisites:**  Node.js
+
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
+=======
 # 🐊 NILE INVESTMENT — Production-Grade Web3 Fintech Platform
 
 > **Institutional Grade • Absolute Control**  
@@ -89,3 +111,4 @@ nile-investment/
 - **Risk Warning:** Cryptocurrency trading and decentralized liquidity protocols involve financial risk.
 - **MPC Architecture:** Multi-party computation ensures zero single-point-of-failure key exposure.
 - **Immutable Audit Trail:** All administrative operations are logged with timestamps and operator reasons.
+>>>>>>> c8e6a1d5158bca5c59da9cc43a8d83d4c1f2e507

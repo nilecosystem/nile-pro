@@ -1,3 +1,4 @@
+// src/backend/main/routes/investmentRoutes.js
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
@@ -5,7 +6,7 @@ const investmentEngine = require('../services/investmentEngine');
 const { distributeReferralCommissions } = require('../services/referralEngine');
 const prisma = require('../utils/prisma');
 
-// Get all available investment plans
+// ✅ Get all available investment plans
 router.get('/plans', async (req, res) => {
   try {
     const plans = await prisma.investmentPlan.findMany({
@@ -18,48 +19,52 @@ router.get('/plans', async (req, res) => {
   }
 });
 
-// Profit simulator / preview
+// ✅ Profit simulator / preview
 router.post('/simulate', (req, res) => {
   const { planType, amount, lockDays, isNileFunded } = req.body;
   const numAmount = parseFloat(amount) || 0;
 
-  let baseDailyRate = 0;
-  if (planType === 'AMOUNT_TIER') {
-    baseDailyRate = investmentEngine.calculateProfitRate('AMOUNT_TIER', numAmount);
-  } else if (planType === 'TIME_LOCKED') {
-    const lockMap = { 30: 50, 50: 100, 100: 250 };
-    const fixedRewardPercent = lockMap[lockDays] || 0;
-    const finalRewardPercent = isNileFunded ? (fixedRewardPercent * 2) : fixedRewardPercent;
-    return res.json({
+  try {
+    let baseDailyRate = 0;
+    if (planType === 'AMOUNT_TIER') {
+      baseDailyRate = investmentEngine.calculateProfitRate('AMOUNT_TIER', numAmount);
+    } else if (planType === 'TIME_LOCKED') {
+      const lockMap = { 30: 50, 50: 100, 100: 250 };
+      const fixedRewardPercent = lockMap[lockDays] || 0;
+      const finalRewardPercent = isNileFunded ? (fixedRewardPercent * 2) : fixedRewardPercent;
+      return res.json({
+        success: true,
+        amount: numAmount,
+        lockDays,
+        isNileFunded: !!isNileFunded,
+        fixedRewardPercent: finalRewardPercent,
+        estimatedTotalReward: (numAmount * finalRewardPercent) / 100,
+        totalMaturityPayout: numAmount + ((numAmount * finalRewardPercent) / 100)
+      });
+    } else {
+      baseDailyRate = 1.0;
+    }
+
+    const effectiveDailyRate = isNileFunded ? (baseDailyRate * 2) : baseDailyRate;
+    const dailyProfit = (numAmount * effectiveDailyRate) / 100;
+    const monthlyProfit = dailyProfit * 30;
+
+    res.json({
       success: true,
       amount: numAmount,
-      lockDays,
       isNileFunded: !!isNileFunded,
-      fixedRewardPercent: finalRewardPercent,
-      estimatedTotalReward: (numAmount * finalRewardPercent) / 100,
-      totalMaturityPayout: numAmount + ((numAmount * finalRewardPercent) / 100)
+      baseDailyRate,
+      effectiveDailyRate,
+      dailyProfit,
+      monthlyProfit,
+      annualEstimatedYieldPercent: effectiveDailyRate * 365
     });
-  } else {
-    baseDailyRate = 1.0;
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
-
-  const effectiveDailyRate = isNileFunded ? (baseDailyRate * 2) : baseDailyRate;
-  const dailyProfit = (numAmount * effectiveDailyRate) / 100;
-  const monthlyProfit = dailyProfit * 30;
-
-  res.json({
-    success: true,
-    amount: numAmount,
-    isNileFunded: !!isNileFunded,
-    baseDailyRate,
-    effectiveDailyRate,
-    dailyProfit,
-    monthlyProfit,
-    annualEstimatedYieldPercent: effectiveDailyRate * 365
-  });
 });
 
-// Create new investment
+// ✅ Create new investment
 router.post('/', authenticateToken, async (req, res) => {
   const { planId, amount, paymentSource } = req.body;
   try {
@@ -70,7 +75,7 @@ router.post('/', authenticateToken, async (req, res) => {
       paymentSource: paymentSource || 'INTERNAL_WALLET'
     });
 
-    // Automatically trigger multi-level referral commission distribution
+    // Trigger referral commission distribution
     try {
       await distributeReferralCommissions({
         investorUserId: req.user.id,
@@ -93,7 +98,7 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Get user's investments
+// ✅ Get user's investments
 router.get('/my', authenticateToken, async (req, res) => {
   try {
     const investments = await prisma.userInvestment.findMany({
@@ -107,7 +112,7 @@ router.get('/my', authenticateToken, async (req, res) => {
   }
 });
 
-// Stake NILE Tokens
+// ✅ Stake NILE Tokens
 router.post('/stake', authenticateToken, async (req, res) => {
   const { amount, lockDays } = req.body;
   try {
@@ -126,7 +131,7 @@ router.post('/stake', authenticateToken, async (req, res) => {
   }
 });
 
-// Get user's NILE stakings
+// ✅ Get user's NILE stakings
 router.get('/stakes', authenticateToken, async (req, res) => {
   try {
     const stakings = await prisma.nileStaking.findMany({
