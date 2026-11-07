@@ -1,4 +1,5 @@
 import React from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import LiveCryptoTicker from './components/LiveCryptoTicker';
 import Navbar from './components/Navbar';
 import AppInstallBanner from './components/AppInstallBanner';
@@ -65,6 +66,9 @@ export default function App() {
       <AuthModal />
       <UserDashboardModal />
       <AdminPanelModal />
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
     </div>
   );
 }
