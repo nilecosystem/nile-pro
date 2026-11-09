@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { AppProvider, useApp } from './context/AppContext.tsx';
 import { Header } from './components/Header.tsx';
 import { Footer } from './components/Footer.tsx';
@@ -166,6 +167,9 @@ const AppContent: React.FC = () => {
       <div className="relative z-10">
         <Footer />
       </div>
+
+      {/* 7. Vercel Speed Insights */}
+      <SpeedInsights />
     </div>
   );
 };
